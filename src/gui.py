@@ -1,10 +1,13 @@
+import subprocess
+from pathlib import Path
+
 import flet as ft
 
-from create_coin import create_coin
-from backtraking import backtrack_cambio_exacto
+from .create_coin import create_coin
+from .backtraking import backtrack_cambio_exacto
 
 
-class CambioExactoVisualApp:
+class CambioExactoApp:
     def __init__(self):
         self.denominations = []
         self.limits = []
@@ -200,7 +203,7 @@ class CambioExactoVisualApp:
         self.target_input.value = ""
         self.solutions_container.controls.clear()
         self.best_solution_container.controls.clear()
-        self.coins_display.content = ft.Container()
+        self.coins_display.content.clean()
         self.step_counter_text.value = "Pasos: 0"
         self.page.update()
 
@@ -211,7 +214,26 @@ class CambioExactoVisualApp:
         self.target_input.value = "7"
         self.page.update()
 
-    def main(self, page: ft.Page):
+    def visualize_backtracking(self, e):
+        """Llama un subproceso para visualizar el backtracking."""
+        python_file = Path(__file__).parent / "network_steps.py"
+        prompt = [
+            "python3",
+            str(python_file),
+            "--denominations", *list(self.denominations_input.value.split()),
+            "--limits", *list(self.limits_input.value.split()),
+            "--target", self.target_input.value.strip()
+        ]
+        print(f"Ejecutando visualizador con comando: {prompt}")
+        try:
+            subprocess.run(prompt, check=True)
+        except subprocess.CalledProcessError as ex:
+            print(f"Error al ejecutar el visualizador: {ex}")
+            self.page.add(ft.Text("Error al ejecutar el visualizador. Ver consola para más detalles."))
+            self.page.update()
+
+
+    def create_app(self, page: ft.Page):
         self.page = page
         page.title = "🪙 Cambio exacto - Algoritmo Backtracking"
         page.theme_mode = ft.ThemeMode.LIGHT
@@ -248,6 +270,13 @@ class CambioExactoVisualApp:
                 bgcolor=ft.Colors.BLUE_600,
                 color=ft.Colors.WHITE,
                 icon=ft.Icons.SEARCH,
+            ),
+            ft.ElevatedButton(
+                "Visualizar backtracking",
+                on_click=self.visualize_backtracking,
+                bgcolor=ft.Colors.BLUE_800,
+                color=ft.Colors.WHITE,
+                icon=ft.Icons.ACCOUNT_TREE_ROUNDED,
             ),
             ft.OutlinedButton(
                 "Cargar ejemplo",
@@ -338,8 +367,3 @@ class CambioExactoVisualApp:
                 margin=ft.margin.symmetric(vertical=10),
             ),
         )
-
-# Para ejecutar la aplicación
-if __name__ == "__main__":
-    app = CambioExactoVisualApp()
-    ft.app(target=app.main)
