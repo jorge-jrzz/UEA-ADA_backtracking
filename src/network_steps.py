@@ -1,4 +1,5 @@
 import time
+import argparse
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -232,7 +233,13 @@ def view_backtracking_tree(denominations: list[int], limits: list[int], target_a
 
 
 if __name__ == "__main__":
-    DENOMINATIONS = [1, 3]
-    LIMITS = [2, 3]
-    TARGET_AMOUNT = 6
-    view_backtracking_tree(DENOMINATIONS, LIMITS, TARGET_AMOUNT)
+    parser = argparse.ArgumentParser(description="Visualiza el árbol de backtracking para el problema de cambio exacto.")
+    parser.add_argument('--denominations', nargs='+', type=int, required=True, help='Lista de denominaciones (ej: 1 3)')
+    parser.add_argument('--limits', nargs='+', type=int, required=True, help='Lista de límites para cada denominación (ej: 2 3)')
+    parser.add_argument('--target', type=int, required=True, help='Cantidad objetivo (ej: 6)')
+    args = parser.parse_args()
+
+    if len(args.denominations) != len(args.limits):
+        raise ValueError("La cantidad de denominaciones y límites debe ser igual.")
+
+    view_backtracking_tree(args.denominations, args.limits, args.target)
