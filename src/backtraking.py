@@ -7,7 +7,8 @@ def backtrack_cambio_exacto(
     target_amount: int
 ) -> Dict[str, Any]:
     """
-    Algoritmo de backtracking universal para el problema de cambio exacto.
+    Algoritmo de backtracking optimizado para el problema de cambio exacto.
+    Cuando encuentra una solución válida, no explora denominaciones restantes.
     Devuelve un diccionario con:
       - 'solutions': lista de soluciones encontradas
       - 'steps': lista de todos los pasos explorados (para visualización)
@@ -23,7 +24,7 @@ def backtrack_cambio_exacto(
             'pos': pos,
             'current_sum': current_sum,
             'combination': list(current_combination),
-            'status': 'exploring'
+            'status': 'explorando'
         })
 
         # Caso base 1: Suma excede el objetivo (poda)
@@ -32,36 +33,45 @@ def backtrack_cambio_exacto(
                 'pos': pos,
                 'current_sum': current_sum,
                 'combination': list(current_combination),
-                'status': 'pruned'
+                'status': 'podado'
             })
             return
 
-        # Caso base 2: Llegamos al final
+        # Caso base 2: Suma exacta encontrada
+        if current_sum == target_amount:
+            # Completar la combinación con ceros para las denominaciones restantes
+            complete_combination = list(current_combination)
+            for i in range(pos, num_denominations):
+                complete_combination[i] = 0
+            
+            solutions.append({
+                'combination': complete_combination,
+                'sum': current_sum
+            })
+            steps.append({
+                'pos': pos,
+                'current_sum': current_sum,
+                'combination': complete_combination,
+                'status': 'solución'
+            })
+            return
+
+        # Caso base 3: Llegamos al final sin encontrar solución
         if pos == num_denominations:
-            if current_sum == target_amount:
-                solutions.append({
-                    'combination': list(current_combination),
-                    'sum': current_sum
-                })
-                steps.append({
-                    'pos': pos,
-                    'current_sum': current_sum,
-                    'combination': list(current_combination),
-                    'status': 'solution'
-                })
-            else:
-                steps.append({
-                    'pos': pos,
-                    'current_sum': current_sum,
-                    'combination': list(current_combination),
-                    'status': 'dead_end'
-                })
+            steps.append({
+                'pos': pos,
+                'current_sum': current_sum,
+                'combination': list(current_combination),
+                'status': 'rama muerta'
+            })
             return
 
         # Explorar posibles cantidades para la denominación actual
         for i in range(limits[pos] + 1):
             current_combination[pos] = i
-            _backtrack(pos + 1, current_sum + i * denominations[pos])
+            new_pos = pos + 1
+            new_sum = current_sum + i * denominations[pos]
+            _backtrack(new_pos, new_sum)
 
     _backtrack(0, 0)
     return {

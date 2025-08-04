@@ -12,10 +12,10 @@ ANIMATION_DELAY = 0.5           # Segundos entre pasos (0 = sin animación)
 SHOW_STEP_BY_STEP = True        # True = muestra paso a paso, False = solo resultado final
 COLOR_MAP = {
     'root': '#1565C0',
-    'exploring': '#FF9800',
-    'solution': '#4CAF50',
-    'pruned': '#F44336',
-    'dead_end': '#757575'
+    'explorando': '#FF9800',
+    'solución': '#4CAF50',
+    'podado': '#F44336',
+    'rama muerta': '#757575'
 }
 
 
@@ -34,7 +34,7 @@ class BacktrackingTreeVisualizer:
         
         # Inicializar nodo raíz
         self.tree_graph.add_node('root', 
-                               label='RAÍZ\nΣ=0', 
+                               label='Raíz\nΣ=0', 
                                status='root',
                                level=0,
                                step=0)
